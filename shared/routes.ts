@@ -180,3 +180,10 @@ export function buildUrl(path: string, params?: Record<string, string | number>)
   }
   return url;
 }
+
+// Helper for auth headers (frontend use)
+export const getToken = () => localStorage.getItem("token");
+export const getAuthHeaders = (): Record<string, string> => {
+  const token = getToken();
+  return token ? { "Authorization": `Bearer ${token}` } : {};
+};

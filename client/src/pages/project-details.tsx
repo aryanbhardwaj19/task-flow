@@ -240,7 +240,11 @@ function TaskCard({ task, onStatusChange, onDelete }: any) {
     <motion.div
       layout
       draggable
-      onDragStart={(e) => e.dataTransfer.setData("taskId", task.id.toString())}
+      onDragStart={(e: any) => {
+        if (e.dataTransfer) {
+          e.dataTransfer.setData("taskId", task.id.toString());
+        }
+      }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}

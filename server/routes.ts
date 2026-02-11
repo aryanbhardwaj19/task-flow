@@ -233,7 +233,8 @@ export async function registerRoutes(
     const project = await storage.createProject({
       name: "Demo Project",
       description: "A sample project to get you started",
-      ownerId: user.id
+      ownerId: user.id,
+      status: "active"
     });
 
     await storage.createTask({
@@ -243,7 +244,7 @@ export async function registerRoutes(
       projectId: project.id,
       assigneeId: user.id
     });
-    
+
     await storage.createTask({
       title: "In Progress Task",
       description: "This task is currently being worked on.",

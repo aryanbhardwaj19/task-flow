@@ -76,6 +76,7 @@ export class DatabaseStorage implements IStorage {
       name: projects.name,
       description: projects.description,
       ownerId: projects.ownerId,
+      status: projects.status,
       createdAt: projects.createdAt
     })
     .from(projects)
