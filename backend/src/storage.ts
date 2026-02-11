@@ -4,7 +4,7 @@ import {
   type Project, type InsertProject,
   type Task, type InsertTask,
   type ProjectMember, type InsertProjectMember
-} from "@shared/schema";
+} from "../shared/schema";
 import { UserModel, ProjectModel, TaskModel, ProjectMemberModel } from "./models";
 
 export interface IStorage {

@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { User, Project, Task, ProjectMember } from "@shared/schema";
+import { User, Project, Task, ProjectMember } from "../shared/schema";
 
 // User Schema
 const userSchema = new Schema<User>({
