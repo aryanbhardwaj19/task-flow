@@ -1,9 +1,19 @@
+import cors from "cors";
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { createServer } from "http";
 
 const app = express();
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://task-flow-eta-wheat.vercel.app"
+    ],
+    credentials: true,
+  })
+);
 const httpServer = createServer(app);
 
 declare module "http" {
