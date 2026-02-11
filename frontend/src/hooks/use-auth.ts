@@ -2,18 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type InsertUser } from "@shared/routes";
 import { z } from "zod";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/api";
+import { getToken, setToken, removeToken, getAuthHeaders } from "@/lib/auth";
 
-// Helper to manage token
-const TOKEN_KEY = "auth_token";
-export const getToken = () => localStorage.getItem(TOKEN_KEY);
-export const setToken = (token: string) => localStorage.setItem(TOKEN_KEY, token);
-export const removeToken = () => localStorage.removeItem(TOKEN_KEY);
-
-// Auth headers helper
-export const getAuthHeaders = (): Record<string, string> => {
-  const token = getToken();
-  return token ? { "Authorization": `Bearer ${token}` } : {};
-};
+export { getToken, setToken, removeToken, getAuthHeaders }; // Re-export for compatibility
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -26,9 +18,7 @@ export function useAuth() {
       const token = getToken();
       if (!token) return null;
 
-      const res = await fetch(api.auth.me.path, {
-        headers: { ...getAuthHeaders() }
-      });
+      const res = await apiRequest("GET", api.auth.me.path);
 
       if (res.status === 401) {
         removeToken();
@@ -42,11 +32,7 @@ export function useAuth() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: z.infer<typeof api.auth.login.input>) => {
-      const res = await fetch(api.auth.login.path, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      });
+      const res = await apiRequest("POST", api.auth.login.path, credentials);
 
       if (!res.ok) {
         if (res.status === 401) throw new Error("Invalid username or password");
@@ -64,14 +50,11 @@ export function useAuth() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: InsertUser) => {
-      const res = await fetch(api.auth.register.path, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const res = await apiRequest("POST", api.auth.register.path, data);
 
       if (!res.ok) {
-        if (res.status === 400) throw new Error("Username already taken");
+        const error = await res.json().catch(() => ({}));
+        if (res.status === 400) throw new Error(error.message || "Username already taken");
         throw new Error("Registration failed");
       }
 
