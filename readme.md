@@ -85,3 +85,7 @@ This project is a monorepo containing both frontend and backend:
 2.  Set the **Root Directory** to `backend`.
 3.  The build command is `npm run build` (if applicable) or just start with `npm start` (ensure `package.json` has a `start` script executing `dist/index.js` or `ts-node`).
 4.  Add Environment Variables: `MONGO_URL`, `JWT_SECRET`, `PORT`.
+
+### License & Ownership
+
+© 2026 Aryan Bhardwaj. All Rights Reserved.
