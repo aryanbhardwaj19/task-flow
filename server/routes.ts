@@ -128,7 +128,11 @@ export async function registerRoutes(
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const input = api.tasks.create.input.parse({ ...req.body, projectId });
+      const input = api.tasks.create.input.parse({ 
+        ...req.body, 
+        projectId,
+        assigneeId: req.body.assigneeId || null 
+      });
       const task = await storage.createTask(input);
       res.status(201).json(task);
     } catch (err) {

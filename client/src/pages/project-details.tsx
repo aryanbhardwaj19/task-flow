@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Reorder } from "framer-motion";
 
 // Schema for creating tasks
 const createTaskSchema = insertTaskSchema.pick({ title: true, description: true }).extend({
@@ -118,9 +118,11 @@ export default function ProjectDetails() {
         <div className="grid md:grid-cols-3 gap-6 flex-1 min-h-0 overflow-x-auto pb-4">
           <KanbanColumn 
             title="To Do" 
+            status="todo"
             count={todoTasks.length} 
             color="bg-slate-500" 
             onAdd={() => openCreateModal("todo")}
+            onTaskDrop={handleStatusChange}
           >
             {todoTasks.map(task => (
               <TaskCard 
@@ -134,9 +136,11 @@ export default function ProjectDetails() {
 
           <KanbanColumn 
             title="In Progress" 
+            status="in_progress"
             count={inProgressTasks.length} 
             color="bg-blue-500" 
             onAdd={() => openCreateModal("in_progress")}
+            onTaskDrop={handleStatusChange}
           >
             {inProgressTasks.map(task => (
               <TaskCard 
@@ -150,9 +154,11 @@ export default function ProjectDetails() {
 
           <KanbanColumn 
             title="Done" 
+            status="done"
             count={doneTasks.length} 
             color="bg-green-500" 
             onAdd={() => openCreateModal("done")}
+            onTaskDrop={handleStatusChange}
           >
             {doneTasks.map(task => (
               <TaskCard 
@@ -192,9 +198,16 @@ export default function ProjectDetails() {
   );
 }
 
-function KanbanColumn({ title, count, color, children, onAdd }: any) {
+function KanbanColumn({ title, status, count, color, children, onAdd, onTaskDrop }: any) {
   return (
-    <div className="flex flex-col h-full bg-muted/40 rounded-2xl border border-border/50">
+    <div 
+      className="flex flex-col h-full bg-muted/40 rounded-2xl border border-border/50"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        const taskId = e.dataTransfer.getData("taskId");
+        if (taskId) onTaskDrop(parseInt(taskId), status);
+      }}
+    >
       <div className="p-4 flex items-center justify-between border-b border-border/40">
         <div className="flex items-center gap-2">
           <div className={`w-3 h-3 rounded-full ${color}`} />
@@ -226,10 +239,12 @@ function TaskCard({ task, onStatusChange, onDelete }: any) {
   return (
     <motion.div
       layout
+      draggable
+      onDragStart={(e) => e.dataTransfer.setData("taskId", task.id.toString())}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className={`bg-card p-4 rounded-xl border border-border shadow-sm hover:shadow-md transition-all group relative border-l-4 ${statusColors[task.status] || "border-l-slate-400"}`}
+      className={`bg-card p-4 rounded-xl border border-border shadow-sm hover:shadow-md transition-all group relative border-l-4 cursor-grab active:cursor-grabbing ${statusColors[task.status] || "border-l-slate-400"}`}
     >
       <div className="flex justify-between items-start mb-2">
         <h4 className="font-medium text-sm leading-snug pr-6">{task.title}</h4>
