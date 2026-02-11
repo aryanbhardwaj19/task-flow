@@ -21,6 +21,7 @@ export interface IStorage {
   
   // Project Members
   addProjectMember(member: InsertProjectMember): Promise<ProjectMember>;
+  getProjectMembers(projectId: number): Promise<User[]>;
   isProjectMember(userId: number, projectId: number): Promise<boolean>;
   isProjectOwner(userId: number, projectId: number): Promise<boolean>;
 
@@ -30,6 +31,9 @@ export interface IStorage {
   createTask(task: InsertTask): Promise<Task>;
   updateTask(id: number, updates: Partial<InsertTask>): Promise<Task>;
   deleteTask(id: number): Promise<void>;
+
+  // Project Settings
+  updateProject(id: number, updates: Partial<InsertProject>): Promise<Project>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -97,6 +101,18 @@ export class DatabaseStorage implements IStorage {
     return newMember;
   }
 
+  async getProjectMembers(projectId: number): Promise<User[]> {
+    const members = await db.select({
+      id: users.id,
+      username: users.username,
+      password: users.password
+    })
+    .from(users)
+    .innerJoin(projectMembers, eq(users.id, projectMembers.userId))
+    .where(eq(projectMembers.projectId, projectId));
+    return members;
+  }
+
   async isProjectMember(userId: number, projectId: number): Promise<boolean> {
     const project = await this.getProject(projectId);
     if (project && project.ownerId === userId) return true;
@@ -137,6 +153,14 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTask(id: number): Promise<void> {
     await db.delete(tasks).where(eq(tasks.id, id));
+  }
+
+  async updateProject(id: number, updates: Partial<InsertProject>): Promise<Project> {
+    const [updated] = await db.update(projects)
+      .set(updates)
+      .where(eq(projects.id, id))
+      .returning();
+    return updated;
   }
 }
 

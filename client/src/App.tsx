@@ -9,6 +9,8 @@ import { Loader2 } from "lucide-react";
 import AuthPage from "@/pages/auth";
 import Dashboard from "@/pages/dashboard";
 import ProjectDetails from "@/pages/project-details";
+import ProjectMembers from "@/pages/project-members";
+import ProjectSettings from "@/pages/project-settings";
 import NotFound from "@/pages/not-found";
 
 // Protected Route Wrapper
@@ -39,6 +41,12 @@ function Router() {
       </Route>
       <Route path="/projects/:id">
         <ProtectedRoute component={ProjectDetails} />
+      </Route>
+      <Route path="/projects/:id/members">
+        <ProtectedRoute component={ProjectMembers} />
+      </Route>
+      <Route path="/projects/:id/settings">
+        <ProtectedRoute component={ProjectSettings} />
       </Route>
       <Route component={NotFound} />
     </Switch>

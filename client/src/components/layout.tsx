@@ -17,6 +17,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   if (!user) return null;
 
+  const isProjectPage = location.startsWith("/projects/");
+  const projectId = isProjectPage ? location.split("/")[2] : null;
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
@@ -35,17 +38,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <LayoutGrid className="w-5 h-5" />
             My Projects
           </Link>
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mt-8 mb-2">
-            Workspaces
-          </div>
-          <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium w-full text-left text-muted-foreground hover:bg-muted hover:text-foreground">
-            <Users className="w-5 h-5" />
-            Team Members
-          </button>
-          <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium w-full text-left text-muted-foreground hover:bg-muted hover:text-foreground">
-            <Settings className="w-5 h-5" />
-            Settings
-          </button>
+          
+          {projectId && (
+            <>
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mt-8 mb-2">
+                Project
+              </div>
+              <Link href={`/projects/${projectId}`} className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${location === `/projects/${projectId}` ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
+                <CheckSquare className="w-5 h-5" />
+                Tasks
+              </Link>
+              <Link href={`/projects/${projectId}/members`} className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${location === `/projects/${projectId}/members` ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
+                <Users className="w-5 h-5" />
+                Team Members
+              </Link>
+              <Link href={`/projects/${projectId}/settings`} className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${location === `/projects/${projectId}/settings` ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
+                <Settings className="w-5 h-5" />
+                Settings
+              </Link>
+            </>
+          )}
         </nav>
 
         <div className="p-4 border-t border-border">

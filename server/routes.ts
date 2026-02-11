@@ -110,6 +110,49 @@ export async function registerRoutes(
     res.json(project);
   });
 
+  app.patch(api.projects.update.path, authenticateToken, async (req: any, res) => {
+    const projectId = Number(req.params.id);
+    if (!(await storage.isProjectOwner(req.user.id, projectId))) {
+      return res.status(403).json({ message: "Only owners can update project settings" });
+    }
+    try {
+      const input = api.projects.update.input.parse(req.body);
+      const updated = await storage.updateProject(projectId, input);
+      res.json(updated);
+    } catch (err) {
+      res.status(400).json({ message: "Invalid input" });
+    }
+  });
+
+  app.get(api.projects.members.list.path, authenticateToken, async (req: any, res) => {
+    const projectId = Number(req.params.id);
+    if (!(await storage.isProjectMember(req.user.id, projectId))) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    const members = await storage.getProjectMembers(projectId);
+    res.json(members.map(m => ({ id: m.id, username: m.username })));
+  });
+
+  app.post(api.projects.members.add.path, authenticateToken, async (req: any, res) => {
+    const projectId = Number(req.params.id);
+    if (!(await storage.isProjectOwner(req.user.id, projectId))) {
+      return res.status(403).json({ message: "Only owners can add members" });
+    }
+    try {
+      const { username } = api.projects.members.add.input.parse(req.body);
+      const userToAdd = await storage.getUserByUsername(username);
+      if (!userToAdd) return res.status(404).json({ message: "User not found" });
+      
+      const isAlreadyMember = await storage.isProjectMember(userToAdd.id, projectId);
+      if (isAlreadyMember) return res.status(400).json({ message: "User is already a member" });
+
+      await storage.addProjectMember({ projectId, userId: userToAdd.id });
+      res.status(201).json({ id: userToAdd.id, username: userToAdd.username });
+    } catch (err) {
+      res.status(400).json({ message: "Invalid input" });
+    }
+  });
+
   // === Tasks Routes ===
 
   app.get(api.tasks.list.path, authenticateToken, async (req: any, res) => {

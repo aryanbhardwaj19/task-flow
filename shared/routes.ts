@@ -90,6 +90,39 @@ export const api = {
         403: errorSchemas.forbidden,
       },
     },
+    update: {
+      method: 'PATCH' as const,
+      path: '/api/projects/:id' as const,
+      input: insertProjectSchema.partial(),
+      responses: {
+        200: z.custom<typeof projects.$inferSelect>(),
+        401: errorSchemas.unauthorized,
+        403: errorSchemas.forbidden,
+        404: errorSchemas.notFound,
+      },
+    },
+    members: {
+      list: {
+        method: 'GET' as const,
+        path: '/api/projects/:id/members' as const,
+        responses: {
+          200: z.array(z.object({ id: z.number(), username: z.string() })),
+          401: errorSchemas.unauthorized,
+          403: errorSchemas.forbidden,
+        }
+      },
+      add: {
+        method: 'POST' as const,
+        path: '/api/projects/:id/members' as const,
+        input: z.object({ username: z.string() }),
+        responses: {
+          201: z.object({ id: z.number(), username: z.string() }),
+          401: errorSchemas.unauthorized,
+          403: errorSchemas.forbidden,
+          404: errorSchemas.notFound,
+        }
+      }
+    }
   },
   tasks: {
     list: {

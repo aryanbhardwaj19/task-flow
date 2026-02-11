@@ -16,6 +16,7 @@ export const projects = pgTable("projects", {
   name: text("name").notNull(),
   description: text("description"),
   ownerId: integer("owner_id").notNull(), // FK to users
+  status: text("status").notNull().default("active"), // active, archived
   createdAt: timestamp("created_at").defaultNow(),
 });
 
