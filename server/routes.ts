@@ -173,10 +173,9 @@ export async function registerRoutes(
 
       const input = api.tasks.create.input.parse({ 
         ...req.body, 
-        projectId,
         assigneeId: req.body.assigneeId || null 
       });
-      const task = await storage.createTask(input);
+      const task = await storage.createTask({ ...input, projectId });
       res.status(201).json(task);
     } catch (err) {
       if (err instanceof z.ZodError) {
